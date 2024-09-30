@@ -1,0 +1,20 @@
+# Exclude all files unless added explicitly
+*
+
+# Add git config files
+!.gitignore
+
+# Add all scripts/shortucts
+!scripts/
+
+# Add all stm32 apps, will include by file
+!stm32/
+
+# Add temp-relay app
+!stm32/temp-relay-f446re/
+!stm32/temp-relay-f446re/Core/
+!stm32/temp-relay-f446re/Core/Inc/
+!stm32/temp-relay-f446re/Core/Inc/app.h
+!stm32/temp-relay-f446re/Core/
+!stm32/temp-relay-f446re/Core/Src/
+!stm32/temp-relay-f446re/Core/Src/app.c

@@ -1,9 +1,8 @@
-#include "main.h"
-#include "cmsis_os.h"
-
 #include <stdbool.h>
 #include <string.h>
 #include <stdio.h>
+
+#include "app.h"
 
 static uint16_t hits;
 
@@ -40,9 +39,8 @@ uint16_t ConvertFromTemp(float temp) {
   return val;
 }
 
-void ReadTemperatureFrom(const uint8_t reg, uint8_t buf[12]) {
+void ReadTemperatureFrom(const uint8_t reg, uint8_t buf[20]) {
   HAL_StatusTypeDef ret;
-  int16_t val;
   float temp;
 
   buf[0] = reg;
@@ -62,7 +60,7 @@ void ReadTemperatureFrom(const uint8_t reg, uint8_t buf[12]) {
   sprintf((char*)buf, "%u.%02u C\r\n", ((unsigned int)temp / 100), ((unsigned int)temp % 100));
 }
 
-void WriteTemperatureTo(const uint8_t reg, const float temp, uint8_t buf[12]) {
+void WriteTemperatureTo(const uint8_t reg, const float temp, uint8_t buf[20]) {
   HAL_StatusTypeDef ret;
   int16_t val = ConvertFromTemp(temp);
 
@@ -70,7 +68,7 @@ void WriteTemperatureTo(const uint8_t reg, const float temp, uint8_t buf[12]) {
   buf[1] = (uint8_t)(val >> 4);
   buf[2] = (uint8_t)(val << 4);
 
-  HAL_I2C_Master_Transmit(&hi2c1, TMP102_ADDR_WRITE, buf, 3, HAL_MAX_DELAY);
+  ret = HAL_I2C_Master_Transmit(&hi2c1, TMP102_ADDR_WRITE, buf, 3, HAL_MAX_DELAY);
   if (ret != HAL_OK) {
     return;
   }
@@ -110,7 +108,7 @@ void WriteToConfig(uint16_t val) {
 
 void App_StartDefaultTask(void)
 {  
-  uint8_t buf[12];
+  uint8_t buf[20];
 
   osDelay(1000);
 

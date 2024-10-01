@@ -1,0 +1,8 @@
+{
+    "files.exclude": {
+        "configs": true,
+        "scripts": true,
+        "stm32": true,
+        "tools": true
+    },
+}

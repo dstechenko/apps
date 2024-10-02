@@ -16,5 +16,11 @@
 			"name": "Temperature Relay (Nucleo-F446RE)",
 			"path": "stm32/temp-relay-f446re"
 		}
-	]
+	],
+	"settings": {
+		"files.associations": {
+			"app.h": "c",
+			"main.h": "c"
+		}
+	}
 }

@@ -14,11 +14,11 @@ static const uint8_t TMP102_REG_TLOW  = 0x02;
 static const uint8_t TMP102_REG_THIGH = 0x03;
 
 extern I2C_HandleTypeDef hi2c1;
-extern UART_HandleTypeDef huart2;
+extern UART_HandleTypeDef huart1;
 
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
-  if (GPIO_Pin == TMP_ALT_Pin) {
+  if (GPIO_Pin == 1) {
     hits++;
   }
 }
@@ -116,38 +116,39 @@ void App_StartDefaultTask(void)
   WriteTemperatureTo(TMP102_REG_THIGH, 30.0, buf);
 
   strcpy((char*)buf, "Low temp: ");
-  HAL_UART_Transmit(&huart2, buf, strlen((char*)buf), HAL_MAX_DELAY);
+  HAL_UART_Transmit(&huart1, buf, strlen((char*)buf), HAL_MAX_DELAY);
   ReadTemperatureFrom(TMP102_REG_TLOW, buf);
-  HAL_UART_Transmit(&huart2, buf, strlen((char*)buf), HAL_MAX_DELAY);
+  HAL_UART_Transmit(&huart1, buf, strlen((char*)buf), HAL_MAX_DELAY);
 
   strcpy((char*)buf, "High temp: ");
-  HAL_UART_Transmit(&huart2, buf, strlen((char*)buf), HAL_MAX_DELAY);
+  HAL_UART_Transmit(&huart1, buf, strlen((char*)buf), HAL_MAX_DELAY);
   ReadTemperatureFrom(TMP102_REG_THIGH, buf);
-  HAL_UART_Transmit(&huart2, buf, strlen((char*)buf), HAL_MAX_DELAY);
+  HAL_UART_Transmit(&huart1, buf, strlen((char*)buf), HAL_MAX_DELAY);
 
   strcpy((char*)buf, "Curr temp: ");
-  HAL_UART_Transmit(&huart2, buf, strlen((char*)buf), HAL_MAX_DELAY);
+  HAL_UART_Transmit(&huart1, buf, strlen((char*)buf), HAL_MAX_DELAY);
   ReadTemperatureFrom(TMP102_REG_TCUR, buf);
-  HAL_UART_Transmit(&huart2, buf, strlen((char*)buf), HAL_MAX_DELAY);
+  HAL_UART_Transmit(&huart1, buf, strlen((char*)buf), HAL_MAX_DELAY);
 
   uint16_t conf = ReadFromConfig();
   WriteToConfig(conf | (1 << 10));
 
   strcpy((char*)buf, "Config: ");
-  HAL_UART_Transmit(&huart2, buf, strlen((char*)buf), HAL_MAX_DELAY);
+  HAL_UART_Transmit(&huart1, buf, strlen((char*)buf), HAL_MAX_DELAY);
   conf = ReadFromConfig();
   sprintf((char*)buf, "0x%x\r\n", conf);
-  HAL_UART_Transmit(&huart2, buf, strlen((char*)buf), HAL_MAX_DELAY);
+  HAL_UART_Transmit(&huart1, buf, strlen((char*)buf), HAL_MAX_DELAY);
 
   while(true)
   {
     if (hits) {
       hits = 0;
       strcpy((char*)buf, "Alert: ");
-      HAL_UART_Transmit(&huart2, buf, strlen((char*)buf), HAL_MAX_DELAY);
+      HAL_UART_Transmit(&huart1, buf, strlen((char*)buf), HAL_MAX_DELAY);
       ReadTemperatureFrom(TMP102_REG_TCUR, buf);
-      HAL_UART_Transmit(&huart2, buf, strlen((char*)buf), HAL_MAX_DELAY);
+      HAL_UART_Transmit(&huart1, buf, strlen((char*)buf), HAL_MAX_DELAY);
     }
     osDelay(500);
+    HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
   }
 }

@@ -18,15 +18,6 @@
 # Add all stm32 apps, will include by file
 !stm32/
 
-# Add temp-relay app nucleo-f446re
-!stm32/temp-relay-f446re/
-!stm32/temp-relay-f446re/Core/
-!stm32/temp-relay-f446re/Core/Inc/
-!stm32/temp-relay-f446re/Core/Inc/app.h
-!stm32/temp-relay-f446re/Core/
-!stm32/temp-relay-f446re/Core/Src/
-!stm32/temp-relay-f446re/Core/Src/app.c
-
 # Add temp-relay app on stm32f103c8t6
 !stm32/temp-relay-stm32f103c8t6/
 !stm32/temp-relay-stm32f103c8t6/.vscode/

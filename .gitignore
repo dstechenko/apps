@@ -3,6 +3,7 @@
 
 # Add git utility files
 !.gitignore
+!.clang-format
 !README.md
 
 # Add VSCode utility files

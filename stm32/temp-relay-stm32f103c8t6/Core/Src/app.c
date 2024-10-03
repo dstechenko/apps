@@ -18,7 +18,7 @@ extern UART_HandleTypeDef huart1;
 
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
-  if (GPIO_Pin == 1) {
+  if (GPIO_Pin == ALT_Pin) {
     hits++;
   }
 }
@@ -108,12 +108,12 @@ void WriteToConfig(uint16_t val) {
 
 void App_StartDefaultTask(void)
 {  
-  uint8_t buf[20];
+  uint8_t buf[50];
 
   osDelay(1000);
 
-  WriteTemperatureTo(TMP102_REG_TLOW, 28.0, buf);
-  WriteTemperatureTo(TMP102_REG_THIGH, 30.0, buf);
+  WriteTemperatureTo(TMP102_REG_TLOW, 29.0, buf);
+  WriteTemperatureTo(TMP102_REG_THIGH, 31.0, buf);
 
   strcpy((char*)buf, "Low temp: ");
   HAL_UART_Transmit(&huart1, buf, strlen((char*)buf), HAL_MAX_DELAY);
@@ -131,11 +131,17 @@ void App_StartDefaultTask(void)
   HAL_UART_Transmit(&huart1, buf, strlen((char*)buf), HAL_MAX_DELAY);
 
   uint16_t conf = ReadFromConfig();
-  WriteToConfig(conf | (1 << 10));
 
   strcpy((char*)buf, "Config: ");
   HAL_UART_Transmit(&huart1, buf, strlen((char*)buf), HAL_MAX_DELAY);
+  sprintf((char*)buf, "0x%x\r\n", conf);
+  HAL_UART_Transmit(&huart1, buf, strlen((char*)buf), HAL_MAX_DELAY);
+  
+  WriteToConfig(conf | (1 << 10));
   conf = ReadFromConfig();
+
+  strcpy((char*)buf, "Config: ");
+  HAL_UART_Transmit(&huart1, buf, strlen((char*)buf), HAL_MAX_DELAY);
   sprintf((char*)buf, "0x%x\r\n", conf);
   HAL_UART_Transmit(&huart1, buf, strlen((char*)buf), HAL_MAX_DELAY);
 
@@ -144,10 +150,12 @@ void App_StartDefaultTask(void)
     if (hits) {
       hits = 0;
       strcpy((char*)buf, "Alert: ");
-      HAL_UART_Transmit(&huart1, buf, strlen((char*)buf), HAL_MAX_DELAY);
-      ReadTemperatureFrom(TMP102_REG_TCUR, buf);
-      HAL_UART_Transmit(&huart1, buf, strlen((char*)buf), HAL_MAX_DELAY);
+    } else {
+      strcpy((char*)buf, "Curr temp: ");  
     }
+    HAL_UART_Transmit(&huart1, buf, strlen((char*)buf), HAL_MAX_DELAY);
+    ReadTemperatureFrom(TMP102_REG_TCUR, buf);
+    HAL_UART_Transmit(&huart1, buf, strlen((char*)buf), HAL_MAX_DELAY);
     osDelay(500);
     HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
   }

@@ -6,6 +6,10 @@
 
 static uint16_t hits;
 
+#define UART_DBG huart1
+#define UART_BT huart2
+#define I2C_TMP hi2c1
+
 static const uint8_t TMP102_ADDR_READ = 0x48 << 1;
 static const uint8_t TMP102_ADDR_WRITE = TMP102_ADDR_READ | 0x01;
 static const uint8_t TMP102_REG_TCUR = 0x00;
@@ -13,16 +17,13 @@ static const uint8_t TMP102_REG_CONF = 0x01;
 static const uint8_t TMP102_REG_TLOW = 0x02;
 static const uint8_t TMP102_REG_THIGH = 0x03;
 
-extern I2C_HandleTypeDef hi2c1;
-extern UART_HandleTypeDef huart1;
-
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
   if (GPIO_Pin == ALT_Pin) {
     hits++;
   }
 }
 
-float ConvertToTemp(uint8_t msb, uint8_t lsb) {
+static float ConvertToTemp(uint8_t msb, uint8_t lsb) {
   int16_t val = ((int16_t)msb << 4) | (lsb >> 4);
   if (val > 0x7FF) {
     val |= 0xF000;
@@ -30,7 +31,7 @@ float ConvertToTemp(uint8_t msb, uint8_t lsb) {
   return (val * 0.0625) * 100;
 }
 
-uint16_t ConvertFromTemp(float temp) {
+static uint16_t ConvertFromTemp(float temp) {
   int16_t val = (int16_t)(temp / 0.0625);
   if (val < 0) {
     val &= 0x0FFF;
@@ -38,7 +39,7 @@ uint16_t ConvertFromTemp(float temp) {
   return val;
 }
 
-void ReadTemperatureFrom(const uint8_t reg, uint8_t buf[20]) {
+static void ReadTemperatureFrom(const uint8_t reg, uint8_t buf[20]) {
   HAL_StatusTypeDef ret;
   float temp;
 
@@ -61,7 +62,8 @@ void ReadTemperatureFrom(const uint8_t reg, uint8_t buf[20]) {
           ((unsigned int)temp % 100));
 }
 
-void WriteTemperatureTo(const uint8_t reg, const float temp, uint8_t buf[20]) {
+static void WriteTemperatureTo(const uint8_t reg, const float temp,
+                               uint8_t buf[20]) {
   HAL_StatusTypeDef ret;
   int16_t val = ConvertFromTemp(temp);
 
@@ -76,7 +78,7 @@ void WriteTemperatureTo(const uint8_t reg, const float temp, uint8_t buf[20]) {
   }
 }
 
-uint16_t ReadFromConfig(void) {
+static uint16_t ReadFromConfig(void) {
   HAL_StatusTypeDef ret;
   uint8_t buf[2];
 
@@ -95,7 +97,7 @@ uint16_t ReadFromConfig(void) {
   return (buf[0] << 8) | buf[1];
 }
 
-void WriteToConfig(uint16_t val) {
+static void WriteToConfig(uint16_t val) {
   HAL_StatusTypeDef ret;
   uint8_t buf[3];
 
@@ -160,5 +162,31 @@ void App_StartDefaultTask(void) {
     HAL_UART_Transmit(&huart1, buf, strlen((char *)buf), HAL_MAX_DELAY);
     osDelay(500);
     HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
+  }
+}
+
+void App_StartInitTask(void *) {
+  while (true) {
+    osThreadYield();
+  }
+}
+
+void App_StartCommsTask(void *) {
+  while (true) {
+    osThreadYield();
+  }
+}
+
+void App_StartInfoTask(void *) {
+  osDelay(5000);
+  while (true) {
+    osDelay(500);
+    HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
+  }
+}
+
+void App_StartMonitorTask(void *) {
+  while (true) {
+    osThreadYield();
   }
 }

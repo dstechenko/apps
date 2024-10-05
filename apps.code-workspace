@@ -16,7 +16,8 @@
 	"settings": {
 		"files.associations": {
 			"app.h": "c",
-			"main.h": "c"
+			"main.h": "c",
+			"cmsis_os.h": "c"
 		}
 	}
 }

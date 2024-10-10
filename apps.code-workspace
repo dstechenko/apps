@@ -9,8 +9,29 @@
 			"path": "scripts"
 		},
 		{
-			"name": "Zephyr Samples",
+			"name": "Samples",
 			"path": "../zephyrproject/zephyr/samples"
+		},
+		{
+			"name": "Temp Control",
+			"path": "temp-ctrl"
+		},
+		{
+			"name": "Temp Relay",
+			"path": "temp-relay"
 		}
 	],
+	"settings": {
+		"files.associations": {
+			"stdio.h": "c",
+			"gpio.h": "c",
+			"kernel.h": "c",
+			"locale": "c",
+			"memory_resource": "c",
+			"ratio": "c",
+			"__verbose_abort": "c",
+			"cstdio": "c"
+		},
+		"C_Cpp.default.compileCommands": ""
+	},
 }

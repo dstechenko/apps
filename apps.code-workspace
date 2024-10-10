@@ -9,15 +9,8 @@
 			"path": "scripts"
 		},
 		{
-			"name": "Temperature Relay (STM32F103C8T6)",
-			"path": "stm32/temp-relay-stm32f103c8t6"
+			"name": "Zephyr Samples",
+			"path": "../zephyrproject/zephyr/samples"
 		}
 	],
-	"settings": {
-		"files.associations": {
-			"app.h": "c",
-			"main.h": "c",
-			"cmsis_os.h": "c"
-		}
-	}
 }

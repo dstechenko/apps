@@ -1,4 +1,5 @@
 #include <stdio.h>
+
 #include <zephyr/drivers/gpio.h>
 #include <zephyr/kernel.h>
 
@@ -8,28 +9,34 @@
 
 static const struct gpio_dt_spec led = GPIO_DT_SPEC_GET(LED0_NODE, gpios);
 
-int main(void) {
-  int ret;
-  bool led_state = true;
+#define MY_STACK_SIZE 500
+#define MY_PRIORITY 5
 
-  if (!gpio_is_ready_dt(&led)) {
-    return 0;
-  }
+static void my_entry_point(void *, void *, void *)
+{
+	int ret;
+	bool led_state = true;
 
-  ret = gpio_pin_configure_dt(&led, GPIO_OUTPUT_ACTIVE);
-  if (ret < 0) {
-    return 0;
-  }
+	if (!gpio_is_ready_dt(&led)) {
+		return;
+	}
 
-  while (1) {
-    ret = gpio_pin_toggle_dt(&led);
-    if (ret < 0) {
-      return 0;
-    }
+	ret = gpio_pin_configure_dt(&led, GPIO_OUTPUT_ACTIVE);
+	if (ret < 0) {
+		return;
+	}
 
-    led_state = !led_state;
-    printf("LED state: %s\n", led_state ? "ON" : "OFF");
-    k_msleep(SLEEP_TIME_MS);
-  }
-  return 0;
+	while (1) {
+		ret = gpio_pin_toggle_dt(&led);
+		if (ret < 0) {
+			return;
+		}
+
+		led_state = !led_state;
+		printf("LED state: %s\n", led_state ? "ON" : "OFF");
+		k_msleep(SLEEP_TIME_MS);
+	}
 }
+
+K_THREAD_DEFINE(my_tid, MY_STACK_SIZE, my_entry_point, NULL, NULL, NULL,
+		MY_PRIORITY, 0, 0);

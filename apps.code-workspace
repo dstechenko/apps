@@ -30,7 +30,10 @@
 			"memory_resource": "c",
 			"ratio": "c",
 			"__verbose_abort": "c",
-			"cstdio": "c"
+			"cstdio": "c",
+			"util.h": "c",
+			"__assert.h": "c",
+			"stdbool.h": "c"
 		},
 		"C_Cpp.default.compileCommands": ""
 	},

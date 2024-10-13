@@ -9,7 +9,7 @@
     tmp102: tmp102@48 {
         label = "tmp102";
         compatible = "ti,tmp102";
-        reg = <0x48>;
+        reg = < 0x48 >;
         status = "okay";
     };
 };

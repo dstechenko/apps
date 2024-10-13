@@ -2,13 +2,17 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#include <zephyr/sys/util.h>
+#include <zephyr/device.h>
+#include <zephyr/devicetree.h>
 #include <zephyr/drivers/gpio.h>
+#include <zephyr/drivers/i2c.h>
 #include <zephyr/kernel.h>
+#include <zephyr/sys/util.h>
 
 #define SLEEP_TIME_MS 2000
-#define LED0_NODE DT_ALIAS(led0)
-static const struct gpio_dt_spec led = GPIO_DT_SPEC_GET(LED0_NODE, gpios);
+
+static const struct gpio_dt_spec led_alive = GPIO_DT_SPEC_GET(DT_ALIAS(led_alive), gpios);
+static const struct i2c_dt_spec i2c_temp = I2C_DT_SPEC_GET(DT_ALIAS(i2c_temp));
 
 // TODO: move into Kconfig
 #define CONFIG_COMMS_STACK_SIZE 500
@@ -21,7 +25,14 @@ static const struct gpio_dt_spec led = GPIO_DT_SPEC_GET(LED0_NODE, gpios);
 #define CONFIG_MONITOR_STACK_SIZE 500
 #define CONFIG_MONITOR_PRIORITY 5
 
-extern float bits_to_temp(const uint8_t msb, const uint8_t lsb)
+static const uint8_t TMP102_ADDR_READ = 0x48 << 1;
+static const uint8_t TMP102_ADDR_WRITE = TMP102_ADDR_READ | 0x01;
+static const uint8_t TMP102_REG_TCUR = 0x00;
+static const uint8_t TMP102_REG_CONF = 0x01;
+static const uint8_t TMP102_REG_TLOW = 0x02;
+static const uint8_t TMP102_REG_THIGH = 0x03;
+
+extern float temp_from_bits(const uint8_t msb, const uint8_t lsb)
 {
 	int16_t val = ((int16_t)msb << 4) | (lsb >> 4);
 	if (val > 0x7FF) {
@@ -37,6 +48,21 @@ extern uint16_t temp_to_bits(const float temp)
 		bits &= 0x0FFF;
 	}
 	return bits;
+}
+
+extern int temp_read_config(uint16_t *config)
+{
+	int err;
+	uint8_t buf[2] = { TMP102_REG_CONF, 0 };
+
+	if (!i2c_is_ready_dt(&i2c_temp)) {
+		return -ENODEV;
+	}
+
+	err = i2c_write_read_dt(&i2c_temp, buf, 1, buf, sizeof(buf));
+	*config = (buf[0] << 8) | buf[1];
+
+	return err;
 }
 
 static void comms_run_thread()
@@ -63,9 +89,9 @@ static void info_init_gpio(void)
 {
 	int err;
 
-	err = gpio_is_ready_dt(&led) ? 0 : -EBUSY;
+	err = gpio_is_ready_dt(&led_alive) ? 0 : -EBUSY;
 	if (!err) {
-		err = gpio_pin_configure_dt(&led, GPIO_OUTPUT_ACTIVE);
+		err = gpio_pin_configure_dt(&led_alive, GPIO_OUTPUT_ACTIVE);
 	}
 
 	__ASSERT_NO_MSG(!err);
@@ -102,9 +128,13 @@ static void info_run_thread()
 		}
 
 		if (sig_state && sig_result == INFO_ALIVE_SIGNAL) {
-			gpio_pin_toggle_dt(&led);
+			gpio_pin_toggle_dt(&led_alive);
 			led_state = !led_state;
 			printf("LED state: %s\n", led_state ? "ON" : "OFF");
+			uint16_t config = 0;
+			if (!temp_read_config(&config)) {
+				printf("Config: 0x%x\n", config);
+			}
 		}
 	}
 }

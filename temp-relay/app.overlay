@@ -1,13 +1,21 @@
 / {
     aliases {
 	    led-alive = &led;
-        i2c-temp = &tmp102;
+        alt-temp = &tmp102_alt;
+        i2c-temp = &tmp102_i2c;
+    };
+    alerts {
+        compatible = "gpio-keys";
+        tmp102_alt: tmp102_alt {
+            label = "tmp102_alt";
+            gpios = < &gpiob 8 GPIO_ACTIVE_HIGH >;
+        };
     };
 };
 
 &i2c1 {
-    tmp102: tmp102@48 {
-        label = "tmp102";
+    tmp102_i2c: tmp102_i2c@48 {
+        label = "tmp10_i2c";
         compatible = "ti,tmp102";
         reg = < 0x48 >;
         status = "okay";

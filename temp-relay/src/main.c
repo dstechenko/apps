@@ -12,6 +12,7 @@
 #define SLEEP_TIME_MS 1000
 
 static const struct gpio_dt_spec led_alive = GPIO_DT_SPEC_GET(DT_ALIAS(led_alive), gpios);
+static const struct gpio_dt_spec alt_temp = GPIO_DT_SPEC_GET(DT_ALIAS(alt_temp), gpios);
 static const struct i2c_dt_spec i2c_temp = I2C_DT_SPEC_GET(DT_ALIAS(i2c_temp));
 
 // TODO: move into Kconfig
@@ -185,10 +186,40 @@ static void info_run_thread()
 
 K_THREAD_DEFINE(info_thread, CONFIG_INFO_STACK_SIZE, info_run_thread, NULL, NULL, NULL, CONFIG_INFO_PRIORITY, 0, 0);
 
+static struct gpio_callback alt_temp_cb_data;
+
+static void monitor_alt_temp(const struct device *dev, struct gpio_callback *cb, const uint32_t pins)
+{
+	printf("Alert!\n");
+}
+
+static void monitor_init_gpio(void)
+{
+	int err;
+
+	err = gpio_is_ready_dt(&alt_temp) ? 0 : -EBUSY;
+	if (!err) {
+		err = gpio_pin_configure_dt(&alt_temp, GPIO_INPUT);
+	}
+	__ASSERT_NO_MSG(!err);
+
+	if (!err) {
+		err = gpio_pin_interrupt_configure_dt(&alt_temp, GPIO_INT_EDGE_TO_ACTIVE);
+	}
+	__ASSERT_NO_MSG(!err);
+
+	if (!err) {
+		gpio_init_callback(&alt_temp_cb_data, monitor_alt_temp, BIT(alt_temp.pin));
+		gpio_add_callback(alt_temp.port, &alt_temp_cb_data);
+	}
+}
+
 static void monitor_run_thread()
 {
 	uint16_t config = 0;
 	float temp = 0;
+
+	monitor_init_gpio();
 
 	if (!temp_read(TMP102_REG_LOW, &temp)) {
 		printf("Low on init: %u.%02u C\n", ((unsigned int)temp / 100), ((unsigned int)temp % 100));
@@ -200,7 +231,7 @@ static void monitor_run_thread()
 	if (!temp_read(TMP102_REG_HIGH, &temp)) {
 		printf("High on init: %u.%02u C\n", ((unsigned int)temp / 100), ((unsigned int)temp % 100));
 	}
-	temp_write(TMP102_REG_HIGH, 31.0);
+	temp_write(TMP102_REG_HIGH, 30.0);
 	if (!temp_read(TMP102_REG_HIGH, &temp)) {
 		printf("High now: %u.%02u C\n", ((unsigned int)temp / 100), ((unsigned int)temp % 100));
 	}

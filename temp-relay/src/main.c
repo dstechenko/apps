@@ -163,7 +163,7 @@ static void info_init_timer(void)
 
 static void info_run_thread()
 {
-	int sig_state, sig_result;
+	int sig_state = 0, sig_result = 0;
 
 	info_init_gpio();
 	info_init_signals();

@@ -23,19 +23,11 @@
 	],
 	"settings": {
 		"files.associations": {
-			"stdio.h": "c",
-			"gpio.h": "c",
-			"kernel.h": "c",
-			"locale": "c",
-			"memory_resource": "c",
-			"ratio": "c",
-			"__verbose_abort": "c",
-			"cstdio": "c",
-			"util.h": "c",
-			"__assert.h": "c",
-			"stdbool.h": "c",
-			"i2c.h": "c",
-			"device.h": "c"
+			"*.overlay": "dts",
+			"*.dts": "dts",
+			"*.dtsi": "dts",
+			"*.c": "c",
+			"*.h": "c",
 		},
 		"C_Cpp.default.compileCommands": ""
 	},

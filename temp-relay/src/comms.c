@@ -4,15 +4,13 @@
 #include <zephyr/logging/log.h>
 #include <zephyr/sys/util.h>
 
-#define SLEEP_TIME_MS 1000
-
-#define CONFIG_COMMS_STACK_SIZE 500
-#define CONFIG_COMMS_PRIORITY 5
+LOG_MODULE_REGISTER(comms, CONFIG_COMMS_LOG_LEVEL);
 
 static void comms_run_thread()
 {
 	while (true) {
-		k_msleep(SLEEP_TIME_MS);
+		LOG_INF("thread is alive...");
+		k_msleep(CONFIG_COMMS_ALIVE_LOG_PERIOD_MS);
 	}
 }
 

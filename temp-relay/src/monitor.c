@@ -5,20 +5,19 @@
 #include <zephyr/drivers/gpio.h>
 #include <zephyr/drivers/i2c.h>
 #include <zephyr/kernel.h>
+#include <zephyr/logging/log.h>
 #include <zephyr/sys/util.h>
 
-#define CONFIG_MONITOR_STACK_SIZE 500
-#define CONFIG_MONITOR_PRIORITY 5
+LOG_MODULE_REGISTER(monitor, CONFIG_MONITOR_LOG_LEVEL);
 
-#define SLEEP_TIME_MS 1000
-
-static const uint8_t TMP102_REG_CURR = 0x00;
-static const uint8_t TMP102_REG_CONF = 0x01;
-static const uint8_t TMP102_REG_LOW = 0x02;
-static const uint8_t TMP102_REG_HIGH = 0x03;
+#define TMP102_REG_CURR 0x00
+#define TMP102_REG_CONF 0x01
+#define TMP102_REG_LOW 0x02
+#define TMP102_REG_HIGH 0x03
 
 static const struct gpio_dt_spec alt_temp = GPIO_DT_SPEC_GET(DT_ALIAS(alt_temp), gpios);
 static const struct i2c_dt_spec i2c_temp = I2C_DT_SPEC_GET(DT_ALIAS(i2c_temp));
+static struct gpio_callback alt_temp_cb_data;
 
 static float temp_from_bits(const uint8_t msb, const uint8_t lsb)
 {
@@ -106,8 +105,6 @@ static int temp_write(const uint8_t reg, const float temp)
 	return i2c_write_dt(&i2c_temp, buf, sizeof(buf));
 }
 
-static struct gpio_callback alt_temp_cb_data;
-
 static void monitor_alt_temp(const struct device *dev, struct gpio_callback *cb, const uint32_t pins)
 {
 	printf("Alert!\n");
@@ -170,7 +167,7 @@ static void monitor_run_thread()
 		if (!temp_read(TMP102_REG_CURR, &temp)) {
 			printf("Current: %u.%02u C\n", ((unsigned int)temp / 100), ((unsigned int)temp % 100));
 		}
-		k_msleep(SLEEP_TIME_MS);
+		k_msleep(CONFIG_MONITOR_ALIVE_LOG_PERIOD_MS);
 	}
 }
 

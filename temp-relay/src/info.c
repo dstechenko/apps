@@ -7,6 +7,8 @@
 #include <zephyr/logging/log.h>
 #include <zephyr/sys/util.h>
 
+#include <app_version.h>
+
 LOG_MODULE_REGISTER(info, CONFIG_INFO_LOG_LEVEL);
 
 #define INFO_SIGNAL_UNKNOWN 0x0
@@ -69,6 +71,8 @@ static void info_run_thread()
 	info_init_gpio();
 	info_init_signals();
 	info_init_timer();
+
+	LOG_INF("running v%s", APP_VERSION_STRING);
 
 	while (true) {
 		k_poll(info_events, ARRAY_SIZE(info_events), K_FOREVER);

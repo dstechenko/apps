@@ -7,7 +7,6 @@
     alerts {
         compatible = "gpio-keys";
         tmp102_alt: tmp102_alt {
-            label = "tmp102_alt";
             gpios = < &gpiob 8 GPIO_ACTIVE_HIGH >;
         };
     };
@@ -15,7 +14,6 @@
 
 &i2c1 {
     tmp102_i2c: tmp102_i2c@48 {
-        label = "tmp10_i2c";
         compatible = "ti,tmp102";
         reg = < 0x48 >;
         status = "okay";

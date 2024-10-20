@@ -2,85 +2,89 @@
 
 mainmenu "Temp Relay"
 
-source "Kconfig.zephyr"
+menu "Application"
 
 config COMMS_STACK_SIZE
-    int "Set stack size for comms thread in bytes"
-    default 500
-    help
-        This will be passed to thread creation in init.
+	int "Comms thread stack size"
+	default 500
+	help
+	  This will be passed to thread creation in init.
 
 config COMMS_PRIORITY
-    int "Set priority for comms thread"
-    default 5
-    help
-        See CONFIG_NUM_COOP_PRIORITIES / CONFIG_NUM_PREEMPT_PRIORITIES.
+	int "Comms thread priority"
+	default 5
+	help
+	  See CONFIG_NUM_COOP_PRIORITIES / CONFIG_NUM_PREEMPT_PRIORITIES.
 
 config COMMS_LOG_LEVEL
-      int "Set log level for comms module"
-      depends on LOG
-      default 0
-      help
-        Log levels: OFF(0), ERR(1), WRN(2), INF(3), DBG(4).
+	int "Comms thread log level"
+	depends on LOG
+	default 0
+	help
+	  Log levels: OFF(0), ERR(1), WRN(2), INF(3), DBG(4).
 
 config COMMS_ALIVE_LOG_PERIOD_MS
-      int "Set alive log message period in millis for comms thread"
-      default 5000
-      help
-        This is used to set the alive log ticking.
+	int "Comms thread alive log message period in millis"
+	default 5000
+	help
+	  This is used to set the alive log ticking.
 
 config INFO_STACK_SIZE
-    int "Set stack size for info thread in bytes"
-    default 500
-    help
-        This will be passed to thread creation in init.
+	int "Info thread stack size"
+	default 500
+	help
+	  This will be passed to thread creation in init.
 
 config INFO_PRIORITY
-    int "Set priority for info thread"
-    default 5
-    help
-        See CONFIG_NUM_COOP_PRIORITIES / CONFIG_NUM_PREEMPT_PRIORITIES.
+	int "Info thread priority"
+	default 5
+	help
+	  See CONFIG_NUM_COOP_PRIORITIES / CONFIG_NUM_PREEMPT_PRIORITIES.
 
 config INFO_LOG_LEVEL
-      int "Set log level for info module"
-      depends on LOG
-      default 0
-      help
-        Log levels: OFF(0), ERR(1), WRN(2), INF(3), DBG(4).
+	int "Info thread log level"
+	depends on LOG
+	default 0
+	help
+	  Log levels: OFF(0), ERR(1), WRN(2), INF(3), DBG(4).
 
 config INFO_ALIVE_LED_PERIOD_MS
-      int "Set alive LED tick period in millis"
-      default 1000
-      help
-        This is used to set the alive LED ticking.
+	int "Info thread alive led blinking period in millis"
+	default 1000
+	help
+	  This is used to set the alive LED blinking.
 
 config INFO_ALIVE_LOG_PERIOD_MS
-      int "Set alive log message period in millis for info thread"
-      default 5000
-      help
-        This is used to set the alive log ticking.
+	int "Info thread alive log message period in millis"
+	default 5000
+	help
+	  This is used to set the alive log ticking.
 
 config MONITOR_STACK_SIZE
-    int "Set stack size for monitor thread in bytes"
-    default 500
-    help
-        This will be passed to thread creation in init.
+	int "Monitor thread stack size"
+	default 500
+	help
+	  This will be passed to thread creation in init.
 
 config MONITOR_PRIORITY
-    int "Set priority for monitor thread"
-    default 5
-    help
-        See CONFIG_NUM_COOP_PRIORITIES / CONFIG_NUM_PREEMPT_PRIORITIES.
+	int "Monitor thread priority"
+	default 5
+	help
+	  See CONFIG_NUM_COOP_PRIORITIES / CONFIG_NUM_PREEMPT_PRIORITIES.
 
 config MONITOR_LOG_LEVEL
-      int "Set log level for monitor module"
-      depends on LOG
-      default 0
-      help
-        Log levels: OFF(0), ERR(1), WRN(2), INF(3), DBG(4).
+	int "Monitor thread log level"
+	depends on LOG
+	default 0
+	help
+	  Log levels: OFF(0), ERR(1), WRN(2), INF(3), DBG(4).
 
 config MONITOR_ALIVE_LOG_PERIOD_MS
-      int "Set alive log message period in millis for monitor thread"
-      default 1000
-      help
-        This is used to set the alive log ticking.
+	int "Monitor thread alive log message period in millis"
+	default 1000
+	help
+	  This is used to set the alive log ticking.
+
+endmenu
+
+source "Kconfig.zephyr"

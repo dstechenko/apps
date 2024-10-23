@@ -15,161 +15,186 @@ LOG_MODULE_REGISTER(monitor, CONFIG_MONITOR_LOG_LEVEL);
 #define TMP102_REG_LOW 0x02
 #define TMP102_REG_HIGH 0x03
 
-// static const struct gpio_dt_spec alt_temp = GPIO_DT_SPEC_GET(DT_ALIAS(alt_temp), gpios);
-// static const struct i2c_dt_spec i2c_temp = I2C_DT_SPEC_GET(DT_ALIAS(i2c_temp));
-// static struct gpio_callback alt_temp_cb_data;
+static struct gpio_callback alt_temp_cb_data;
+static const struct gpio_dt_spec alt_temp = GPIO_DT_SPEC_GET(DT_ALIAS(alt_temp), gpios);
+static const struct i2c_dt_spec i2c_temp = I2C_DT_SPEC_GET(DT_ALIAS(i2c_temp));
 
-// static float temp_from_bits(const uint8_t msb, const uint8_t lsb)
-// {
-// 	int16_t val = ((int16_t)msb << 4) | (lsb >> 4);
-// 	if (val > 0x7FF) {
-// 		val |= 0xF000;
-// 	}
-// 	return (val * 0.0625) * 100;
-// }
+static float temp_from_bits(const uint8_t msb, const uint8_t lsb)
+{
+	int16_t val = ((int16_t)msb << 4) | (lsb >> 4);
+	if (val > 0x7FF) {
+		val |= 0xF000;
+	}
+	return (val * 0.0625) * 100;
+}
 
-// static int16_t temp_to_bits(const float temp)
-// {
-// 	int16_t bits = (int16_t)((double)temp / 0.0625);
-// 	if (bits < 0) {
-// 		bits &= 0x0FFF;
-// 	}
-// 	return bits;
-// }
+static int16_t temp_to_bits(const float temp)
+{
+	int16_t bits = (int16_t)((double)temp / 0.0625);
+	if (bits < 0) {
+		bits &= 0x0FFF;
+	}
+	return bits;
+}
 
-// static int temp_read_config(uint16_t *config)
-// {
-// 	int err;
-// 	uint8_t buf[2];
+static int temp_read_config(uint16_t *config)
+{
+	int err;
+	uint8_t buf[2];
 
-// 	if (!i2c_is_ready_dt(&i2c_temp)) {
-// 		return -ENODEV;
-// 	}
+	if (!i2c_is_ready_dt(&i2c_temp)) {
+		LOG_ERR("i2c temp module not ready");
+		return -ENODEV;
+	}
 
-// 	buf[0] = TMP102_REG_CONF;
-// 	buf[1] = 0;
+	buf[0] = TMP102_REG_CONF;
+	buf[1] = 0;
 
-// 	err = i2c_write_read_dt(&i2c_temp, buf, 1, buf, sizeof(buf));
-// 	*config = (buf[0] << 8) | buf[1];
+	err = i2c_write_read_dt(&i2c_temp, buf, 1, buf, sizeof(buf));
+	*config = (buf[0] << 8) | buf[1];
 
-// 	return err;
-// }
+	if (err) {
+		LOG_ERR("i2c temp module err: %d", err);
+	}
 
-// static int temp_write_config(const uint16_t config)
-// {
-// 	uint8_t buf[3];
+	return err;
+}
 
-// 	if (!i2c_is_ready_dt(&i2c_temp)) {
-// 		return -ENODEV;
-// 	}
+static int temp_write_config(const uint16_t config)
+{
+	int err;
+	uint8_t buf[3];
 
-// 	buf[0] = TMP102_REG_CONF;
-// 	buf[1] = config >> 8;
-// 	buf[2] = config & 0xFF;
+	if (!i2c_is_ready_dt(&i2c_temp)) {
+		LOG_ERR("i2c temp module not ready");
+		return -ENODEV;
+	}
 
-// 	return i2c_write_dt(&i2c_temp, buf, sizeof(buf));
-// }
+	buf[0] = TMP102_REG_CONF;
+	buf[1] = config >> 8;
+	buf[2] = config & 0xFF;
+	err = i2c_write_dt(&i2c_temp, buf, sizeof(buf));
 
-// static int temp_read(const uint8_t reg, float *temp)
-// {
-// 	int err;
-// 	uint8_t buf[2];
+	if (err) {
+		LOG_ERR("i2c temp module err: %d", err);
+	}
 
-// 	if (!i2c_is_ready_dt(&i2c_temp)) {
-// 		return -ENODEV;
-// 	}
+	return err;
+}
 
-// 	buf[0] = reg;
-// 	buf[1] = 0;
+static int temp_read(const uint8_t reg, float *temp)
+{
+	int err;
+	uint8_t buf[2];
 
-// 	err = i2c_write_read_dt(&i2c_temp, buf, 1, buf, sizeof(buf));
-// 	*temp = temp_from_bits(buf[0], buf[1]);
+	if (!i2c_is_ready_dt(&i2c_temp)) {
+		LOG_ERR("i2c temp module not ready");
+		return -ENODEV;
+	}
 
-// 	return err;
-// }
+	buf[0] = reg;
+	buf[1] = 0;
 
-// static int temp_write(const uint8_t reg, const float temp)
-// {
-// 	uint8_t buf[3];
-// 	int16_t temp_bits;
+	err = i2c_write_read_dt(&i2c_temp, buf, 1, buf, sizeof(buf));
+	*temp = temp_from_bits(buf[0], buf[1]);
 
-// 	if (!i2c_is_ready_dt(&i2c_temp)) {
-// 		return -ENODEV;
-// 	}
+	if (err) {
+		LOG_ERR("i2c temp module err: %d", err);
+	}
 
-// 	temp_bits = temp_to_bits(temp);
-// 	buf[0] = reg;
-// 	buf[1] = (uint8_t)(temp_bits >> 4);
-// 	buf[2] = (uint8_t)(temp_bits << 4);
+	return err;
+}
 
-// 	return i2c_write_dt(&i2c_temp, buf, sizeof(buf));
-// }
+static int temp_write(const uint8_t reg, const float temp)
+{
+	int err;
+	uint8_t buf[3];
+	int16_t temp_bits;
 
-// static void monitor_alt_temp(const struct device *dev, struct gpio_callback *cb, const uint32_t pins)
-// {
-// 	printf("Alert!\n");
-// }
+	if (!i2c_is_ready_dt(&i2c_temp)) {
+		LOG_ERR("i2c temp module not ready");
+		return -ENODEV;
+	}
 
-// static void monitor_init_gpio(void)
-// {
-// 	int err;
+	temp_bits = temp_to_bits(temp);
+	buf[0] = reg;
+	buf[1] = (uint8_t)(temp_bits >> 4);
+	buf[2] = (uint8_t)(temp_bits << 4);
+	err = i2c_write_dt(&i2c_temp, buf, sizeof(buf));
 
-// 	err = gpio_is_ready_dt(&alt_temp) ? 0 : -EBUSY;
-// 	if (!err) {
-// 		err = gpio_pin_configure_dt(&alt_temp, GPIO_INPUT);
-// 	}
-// 	__ASSERT_NO_MSG(!err);
+	if (err) {
+		LOG_ERR("i2c temp module err: %d", err);
+	}
 
-// 	if (!err) {
-// 		err = gpio_pin_interrupt_configure_dt(&alt_temp, GPIO_INT_EDGE_TO_ACTIVE);
-// 	}
-// 	__ASSERT_NO_MSG(!err);
+	return err;
+}
 
-// 	if (!err) {
-// 		gpio_init_callback(&alt_temp_cb_data, monitor_alt_temp, BIT(alt_temp.pin));
-// 		gpio_add_callback(alt_temp.port, &alt_temp_cb_data);
-// 	}
-// }
+static void monitor_alt_temp(const struct device *dev, struct gpio_callback *cb, const uint32_t pins)
+{
+	LOG_INF("alert!");
+}
 
-// static void monitor_run_thread()
-// {
-// 	uint16_t config = 0;
-// 	float temp = 0;
+static void monitor_init_gpio(void)
+{
+	int err;
 
-// 	monitor_init_gpio();
+	err = gpio_is_ready_dt(&alt_temp) ? 0 : -EBUSY;
+	if (!err) {
+		err = gpio_pin_configure_dt(&alt_temp, GPIO_INPUT);
+	}
+	__ASSERT_NO_MSG(!err);
 
-// 	if (!temp_read(TMP102_REG_LOW, &temp)) {
-// 		printf("Low on init: %u.%02u C\n", ((unsigned int)temp / 100), ((unsigned int)temp % 100));
-// 	}
-// 	temp_write(TMP102_REG_LOW, 29.0);
-// 	if (!temp_read(TMP102_REG_LOW, &temp)) {
-// 		printf("Low now: %u.%02u C\n", ((unsigned int)temp / 100), ((unsigned int)temp % 100));
-// 	}
-// 	if (!temp_read(TMP102_REG_HIGH, &temp)) {
-// 		printf("High on init: %u.%02u C\n", ((unsigned int)temp / 100), ((unsigned int)temp % 100));
-// 	}
-// 	temp_write(TMP102_REG_HIGH, 30.0);
-// 	if (!temp_read(TMP102_REG_HIGH, &temp)) {
-// 		printf("High now: %u.%02u C\n", ((unsigned int)temp / 100), ((unsigned int)temp % 100));
-// 	}
+	if (!err) {
+		err = gpio_pin_interrupt_configure_dt(&alt_temp, GPIO_INT_EDGE_TO_ACTIVE);
+	}
+	__ASSERT_NO_MSG(!err);
 
-// 	if (!temp_read_config(&config)) {
-// 		printf("Config on init: 0x%x\n", config);
-// 	}
-// 	if (!temp_write_config(config | (1 << 10))) {
-// 		printf("Config updated...\n");
-// 	}
-// 	if (!temp_read_config(&config)) {
-// 		printf("Config now: 0x%x\n", config);
-// 	}
+	if (!err) {
+		gpio_init_callback(&alt_temp_cb_data, monitor_alt_temp, BIT(alt_temp.pin));
+		gpio_add_callback(alt_temp.port, &alt_temp_cb_data);
+	}
+}
 
-// 	while (true) {
-// 		if (!temp_read(TMP102_REG_CURR, &temp)) {
-// 			printf("Current: %u.%02u C\n", ((unsigned int)temp / 100), ((unsigned int)temp % 100));
-// 		}
-// 		k_msleep(CONFIG_MONITOR_ALIVE_LOG_PERIOD_MS);
-// 	}
-// }
+static void monitor_run_thread()
+{
+	uint16_t config = 0;
+	float temp = 0;
 
-// K_THREAD_DEFINE(monitor_thread, CONFIG_MONITOR_STACK_SIZE, monitor_run_thread, NULL, NULL, NULL,
-// 		CONFIG_MONITOR_PRIORITY, 0, 0);
+	monitor_init_gpio();
+
+	if (!temp_read(TMP102_REG_LOW, &temp)) {
+		LOG_INF("low on init: %u.%02u C", ((unsigned int)temp / 100), ((unsigned int)temp % 100));
+	}
+	temp_write(TMP102_REG_LOW, 30.0);
+	if (!temp_read(TMP102_REG_LOW, &temp)) {
+		LOG_INF("low now: %u.%02u C", ((unsigned int)temp / 100), ((unsigned int)temp % 100));
+	}
+	if (!temp_read(TMP102_REG_HIGH, &temp)) {
+		LOG_INF("high on init: %u.%02u C", ((unsigned int)temp / 100), ((unsigned int)temp % 100));
+	}
+	temp_write(TMP102_REG_HIGH, 31.0);
+	if (!temp_read(TMP102_REG_HIGH, &temp)) {
+		LOG_INF("high now: %u.%02u C", ((unsigned int)temp / 100), ((unsigned int)temp % 100));
+	}
+
+	if (!temp_read_config(&config)) {
+		LOG_INF("config on init: 0x%x", config);
+	}
+	if (!temp_write_config(config | (1 << 10))) {
+		LOG_INF("config updated...");
+	}
+	if (!temp_read_config(&config)) {
+		LOG_INF("config now: 0x%x", config);
+	}
+
+	while (true) {
+		LOG_INF("thread is alive...");
+		if (!temp_read(TMP102_REG_CURR, &temp)) {
+			LOG_INF("current: %u.%02u C", ((unsigned int)temp / 100), ((unsigned int)temp % 100));
+		}
+		k_msleep(CONFIG_MONITOR_ALIVE_LOG_PERIOD_MS);
+	}
+}
+
+K_THREAD_DEFINE(monitor_thread, CONFIG_MONITOR_STACK_SIZE, monitor_run_thread, NULL, NULL, NULL,
+		CONFIG_MONITOR_PRIORITY, 0, 0);

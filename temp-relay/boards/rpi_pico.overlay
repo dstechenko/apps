@@ -1,9 +1,0 @@
-/ {
-    aliases {
-	    led-alive = &led0;
-    };
-};
-
-&led0 {
-    gpios = <&gpio0 22 GPIO_ACTIVE_HIGH>;
-};

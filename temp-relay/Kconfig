@@ -81,7 +81,7 @@ config MONITOR_LOG_LEVEL
 
 config MONITOR_ALIVE_LOG_PERIOD_MS
 	int "Monitor thread alive log message period in millis"
-	default 1000
+	default 5000
 	help
 	  This is used to set the alive log ticking.
 

@@ -1,6 +1,6 @@
 / {
     aliases {
-	    led-alive = &led;
+	    led-alive = &led0;
         alt-temp = &tmp102_alt;
         i2c-temp = &tmp102_i2c;
     };

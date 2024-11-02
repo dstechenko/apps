@@ -177,35 +177,56 @@ static void monitor_init_gpio(void)
 
 static int monitor_init_temp(void)
 {
+	int err;
 	float temp = 0;
 	uint16_t config = 0;
 
-	if (temp_read(TMP102_REG_LOW, &temp)) {
-		return;
+	err = temp_read(TMP102_REG_LOW, &temp);
+	if (err) {
+		return err;
 	}
 	temp_log("low temp on boot", temp);
-	if (temp_write(TMP102_REG_LOW, 30.0)) {
-		return;
+	err = temp_write(TMP102_REG_LOW, 30.0);
+	if (err) {
+		return err;
 	}
-	if (!temp_read(TMP102_REG_LOW, &temp)) {
-		temp_log("low temp", temp);
+	err = temp_read(TMP102_REG_LOW, &temp);
+	if (err) {
+		return err;
 	}
+	temp_log("low temp", temp);
 
-	if (!temp_read(TMP102_REG_HIGH, &temp)) {
-		temp_log("high temp on boot", temp);
+	err = temp_read(TMP102_REG_HIGH, &temp);
+	if (err) {
+		return err;
 	}
-	temp_write(TMP102_REG_HIGH, 31.0);
-	if (!temp_read(TMP102_REG_HIGH, &temp)) {
-		temp_log("high temp", temp);
+	temp_log("high temp on boot", temp);
+	err = temp_write(TMP102_REG_HIGH, 31.0);
+	if (err) {
+		return err;
 	}
+	err = temp_read(TMP102_REG_HIGH, &temp);
+	if (err) {
+		return err;
+	}
+	temp_log("high temp", temp);
 
-	if (!temp_read_config(&config)) {
-		config_log("config on boot", config);
+	err = temp_read_config(&config);
+	if (err) {
+		return err;
 	}
-	temp_write_config(config | (1 << 10));
-	if (!temp_read_config(&config)) {
-		config_log("config", config);
+	config_log("config on boot", config);
+	err = temp_write_config(config | (1 << 10));
+	if (err) {
+		return err;
 	}
+	err = temp_read_config(&config);
+	if (err) {
+		return err;
+	}
+	config_log("config", config);
+
+	return err;
 }
 
 static void monitor_run_thread()

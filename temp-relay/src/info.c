@@ -9,6 +9,8 @@
 
 #include <app_version.h>
 
+#include "app.h"
+
 LOG_MODULE_REGISTER(info, CONFIG_INFO_LOG_LEVEL);
 
 #define INFO_SIGNAL_UNKNOWN 0x0

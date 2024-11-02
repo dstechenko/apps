@@ -4,6 +4,8 @@
 #include <zephyr/logging/log.h>
 #include <zephyr/sys/util.h>
 
+#include "app.h"
+
 LOG_MODULE_REGISTER(comms, CONFIG_COMMS_LOG_LEVEL);
 
 static void comms_run_thread()

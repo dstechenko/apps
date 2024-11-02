@@ -8,6 +8,8 @@
 #include <zephyr/logging/log.h>
 #include <zephyr/sys/util.h>
 
+#include "app.h"
+
 LOG_MODULE_REGISTER(monitor, CONFIG_MONITOR_LOG_LEVEL);
 
 #define TMP102_REG_CURR 0x00
@@ -129,8 +131,26 @@ static int temp_write(const uint8_t reg, const float temp)
 	return err;
 }
 
+static void temp_log(const char *label, const float temp)
+{
+	unsigned int decimal, fraction;
+
+	decimal = ((unsigned int)temp / 100);
+	fraction = ((unsigned int)temp % 100);
+
+	LOG_INF("%s: %u.%02u C", label, decimal, fraction);
+}
+
+static void config_log(const char *label, const uint16_t config)
+{
+	LOG_INF("%s: 0x%x", label, config);
+}
+
 static void monitor_alt_temp(const struct device *dev, struct gpio_callback *cb, const uint32_t pins)
 {
+	(void)dev;
+	(void)cb;
+	(void)pins;
 	LOG_INF("alert!");
 }
 
@@ -155,42 +175,52 @@ static void monitor_init_gpio(void)
 	}
 }
 
-static void monitor_run_thread()
+static int monitor_init_temp(void)
 {
-	uint16_t config = 0;
 	float temp = 0;
+	uint16_t config = 0;
 
-	monitor_init_gpio();
+	if (temp_read(TMP102_REG_LOW, &temp)) {
+		return;
+	}
+	temp_log("low temp on boot", temp);
+	if (temp_write(TMP102_REG_LOW, 30.0)) {
+		return;
+	}
+	if (!temp_read(TMP102_REG_LOW, &temp)) {
+		temp_log("low temp", temp);
+	}
 
-	if (!temp_read(TMP102_REG_LOW, &temp)) {
-		LOG_INF("low on init: %u.%02u C", ((unsigned int)temp / 100), ((unsigned int)temp % 100));
-	}
-	temp_write(TMP102_REG_LOW, 30.0);
-	if (!temp_read(TMP102_REG_LOW, &temp)) {
-		LOG_INF("low now: %u.%02u C", ((unsigned int)temp / 100), ((unsigned int)temp % 100));
-	}
 	if (!temp_read(TMP102_REG_HIGH, &temp)) {
-		LOG_INF("high on init: %u.%02u C", ((unsigned int)temp / 100), ((unsigned int)temp % 100));
+		temp_log("high temp on boot", temp);
 	}
 	temp_write(TMP102_REG_HIGH, 31.0);
 	if (!temp_read(TMP102_REG_HIGH, &temp)) {
-		LOG_INF("high now: %u.%02u C", ((unsigned int)temp / 100), ((unsigned int)temp % 100));
+		temp_log("high temp", temp);
 	}
 
 	if (!temp_read_config(&config)) {
-		LOG_INF("config on init: 0x%x", config);
+		config_log("config on boot", config);
 	}
-	if (!temp_write_config(config | (1 << 10))) {
-		LOG_INF("config updated...");
-	}
+	temp_write_config(config | (1 << 10));
 	if (!temp_read_config(&config)) {
-		LOG_INF("config now: 0x%x", config);
+		config_log("config", config);
+	}
+}
+
+static void monitor_run_thread()
+{
+	float temp = 0;
+
+	monitor_init_gpio();
+	if (monitor_init_temp()) {
+		return;
 	}
 
 	while (true) {
 		LOG_INF("thread is alive...");
 		if (!temp_read(TMP102_REG_CURR, &temp)) {
-			LOG_INF("current: %u.%02u C", ((unsigned int)temp / 100), ((unsigned int)temp % 100));
+			temp_log("current", temp);
 		}
 		k_msleep(CONFIG_MONITOR_ALIVE_LOG_PERIOD_MS);
 	}

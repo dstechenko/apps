@@ -1,6 +1,7 @@
 # apps/keebz
-Small firmware project for keyboard firmware using Boardbox Microdox v2.
 
+## Intro
+Small firmware project for keyboard firmware using Boardbox Microdox v2.
 It came with two nice!nano v2 microcontrollers. Will try using them.
 
 ## Schematic
@@ -8,3 +9,6 @@ It came with two nice!nano v2 microcontrollers. Will try using them.
 
 ## Pinout
 ![Pinout](https://github.com/dstechenko/apps/blob/main/keebz/docs/nice!nano_v2_pinout.png "Pinout")
+
+## TODOs
+- ???

@@ -10,5 +10,9 @@ It came with two nice!nano v2 microcontrollers. Will try using them.
 ## Pinout
 ![Pinout](https://github.com/dstechenko/apps/blob/main/keebz/docs/nice!nano_v2_pinout.png "Pinout")
 
-## TODOs
+## Required steps
+- Remove [APPPROTECT](https://limitedresults.com/2020/06/nrf52-debug-resurrection-approtect-bypass) for debugging.
+- ???
+
+## Planned steps
 - ???

@@ -10,9 +10,10 @@ It came with two nice!nano v2 microcontrollers. Will try using them.
 ## Pinout
 ![Pinout](https://github.com/dstechenko/apps/blob/main/keebz/docs/nice!nano_v2_pinout.png "Pinout")
 
-## Required steps
+## Useful links
+- Setup for [Zephyr](https://docs.zephyrproject.org/latest/boards/others/promicro_nrf52840/doc/index.html).
+- Setup for [nice!nano v2](https://nicekeyboards.com/nice-nano).
 - Remove [APPPROTECT](https://limitedresults.com/2020/06/nrf52-debug-resurrection-approtect-bypass) for debugging.
-- ???
 
 ## Planned steps
 - ???

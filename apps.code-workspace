@@ -19,6 +19,10 @@
 		{
 			"name": "Temp Relay",
 			"path": "temp-relay"
+		},
+		{
+			"name": "Keebz",
+			"path": "keebz"
 		}
 	],
 	"settings": {

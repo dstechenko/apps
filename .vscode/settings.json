@@ -3,5 +3,6 @@
         "scripts": true,
         "temp-ctrl": true,
         "temp-relay": true,
+        "keebz": true,
     },
 }

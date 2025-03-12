@@ -1,0 +1,13 @@
+# SPDX-License-Identifier: Apache-2.0
+
+mainmenu "Keebz"
+
+menu "Application"
+
+config MAIN_STACK_SIZE
+	int "Main thread stack size"
+	default 500
+
+endmenu
+
+source "Kconfig.zephyr"

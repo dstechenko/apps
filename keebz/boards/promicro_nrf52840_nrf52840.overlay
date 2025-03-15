@@ -1,11 +1,22 @@
 / {
-    aliases {
-	    led-alive = &led_gpio15;
-    };
-    leds {
+	aliases {
+		led-alive = &led_gpio15;
+		hid-kbd = &hid_kbd0;
+	};
+	leds {
 		compatible = "gpio-leds";
 		led_gpio15: led_gpio15 {
 			gpios = <&gpio0 15 GPIO_ACTIVE_HIGH>;
 		};
+	};
+	hid_kbd0: hid_kbd0 {
+		compatible = "zephyr,hid-device";
+		interface-name = "HID0";
+		protocol-code = "keyboard";
+		in-report-size = <64>;
+		in-polling-period-us = <125>;
+		out-report-size = <64>;
+		out-polling-period-us = <125>;
+		status = "okay";
 	};
 };

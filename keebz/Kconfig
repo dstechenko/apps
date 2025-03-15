@@ -4,9 +4,19 @@ mainmenu "Keebz"
 
 menu "Application"
 
-config MAIN_STACK_SIZE
-	int "Main thread stack size"
-	default 500
+config KEEBZ_USB_HID_LOG_LEVEL
+	int "Keebz USB HID thread log level"
+	depends on LOG
+	default 0
+	help
+	  Log levels: OFF(0), ERR(1), WRN(2), INF(3), DBG(4).
+
+config KEEBZ_USB_DEV_LOG_LEVEL
+	int "Keebz USB device thread log level"
+	depends on LOG
+	default 0
+	help
+	  Log levels: OFF(0), ERR(1), WRN(2), INF(3), DBG(4).
 
 endmenu
 

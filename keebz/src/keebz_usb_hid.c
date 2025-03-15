@@ -44,6 +44,7 @@ int main(void)
 
 		led_state = !led_state;
 		k_msleep(SLEEP_TIME_MS);
+		LOG_ERR("LED GPIO toggled!");
 	}
 
 	return 0;

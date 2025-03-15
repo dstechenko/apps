@@ -14,10 +14,6 @@ config KEEBZ_USB_DEV_LOG_LEVEL
 	depends on LOG
 	default 0
 
-config KEEBZ_USB_DEV_MANUFACTURER
-	string "Keebz USB device manufacturer string"
-	default "None"
-
 config KEEBZ_USB_DEV_VENDOR_ID
 	hex "Keebz USB device vendor id"
 	default 0x0000
@@ -25,6 +21,31 @@ config KEEBZ_USB_DEV_VENDOR_ID
 config KEEBZ_USB_DEV_PRODUCT_ID
 	hex "Keebz USB device product id"
 	default 0x0000
+
+config KEEBZ_USB_DEV_MANUFACTURER
+	string "Keebz USB device manufacturer string"
+	default "Unknown"
+
+config KEEBZ_USB_DEV_PRODUCT
+	string "Keebz USB device product string"
+	default "Unknown"
+
+config KEEBZ_USB_DEV_SELF_POWERED
+	bool "Keebz USB device self-powered attribute"
+	default n
+
+config KEEBZ_USB_DEV_REMOTE_WAKEUP
+	bool "Keebz USB device remote wakeup attribute"
+	default n
+
+config KEEBZ_USB_DEV_MAX_POWER
+	int "Keebz USB device max power value (in 2mA units)"
+	default 125
+	range 0 250
+
+config KEEBZ_USB_DEV_20_EXT_DESC
+	bool "Keebz USB device to use USB 2.0 extension descriptor"
+	default true
 
 endmenu
 

@@ -8,15 +8,23 @@ config KEEBZ_USB_HID_LOG_LEVEL
 	int "Keebz USB HID thread log level"
 	depends on LOG
 	default 0
-	help
-	  Log levels: OFF(0), ERR(1), WRN(2), INF(3), DBG(4).
 
 config KEEBZ_USB_DEV_LOG_LEVEL
 	int "Keebz USB device thread log level"
 	depends on LOG
 	default 0
-	help
-	  Log levels: OFF(0), ERR(1), WRN(2), INF(3), DBG(4).
+
+config KEEBZ_USB_DEV_MANUFACTURER
+	string "Keebz USB device manufacturer string"
+	default "None"
+
+config KEEBZ_USB_DEV_VENDOR_ID
+	hex "Keebz USB device vendor id"
+	default 0x0000
+
+config KEEBZ_USB_DEV_PRODUCT_ID
+	hex "Keebz USB device product id"
+	default 0x0000
 
 endmenu
 

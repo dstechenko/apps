@@ -32,6 +32,8 @@
 			"*.dtsi": "dts",
 			"*.c": "c",
 			"*.h": "c",
+			"typeinfo": "c",
+			"charconv": "c"
 		},
 		"C_Cpp.default.compileCommands": ""
 	},

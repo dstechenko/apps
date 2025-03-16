@@ -1,2 +1,2 @@
 #!/bin/bash
-picocom -b 115200 /dev/tty.usbmodem*
+picocom -b 115200 /dev/tty.usbserial-*

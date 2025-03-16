@@ -1,4 +1,7 @@
 / {
+	chosen {
+		zephyr,console = &uart0;
+	};
 	aliases {
 		led-alive = &led_gpio15;
  		hid-kbd = &hid_kbd0;
